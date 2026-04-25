@@ -18,9 +18,8 @@ RUN pip install torch==2.5.0 --index-url https://download.pytorch.org/whl/cpu
 COPY planner-service/requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
-COPY planner-service/pathformer ./pathformer
 COPY shared ./shared
-COPY planner-service/app ./app
+COPY planner-service/src ./src
 
 # best.pt is mounted as volume at /app/weights/best.pt (see docker-compose.yml)
 RUN mkdir -p /app/weights
@@ -29,4 +28,4 @@ ENV PYTHONPATH=/app
 
 EXPOSE 8001
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8001"]

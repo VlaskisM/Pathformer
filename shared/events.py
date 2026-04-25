@@ -1,9 +1,3 @@
-"""Event schemas for RabbitMQ messages.
-
-Shared between map-service and planner-service. Using Pydantic for validation
-at publish-time (catch mistakes before they hit the broker) and at consume-time.
-"""
-
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field

@@ -4,7 +4,7 @@ numpy>=2.0,<3.0
 scipy>=1.14,<2.0
 scikit-image>=0.24
 matplotlib==3.9.2
-boto3==1.35.14
+aioboto3>=13.0.0
 aio-pika==9.4.3
 pydantic==2.9.2
 pydantic-settings==2.5.2

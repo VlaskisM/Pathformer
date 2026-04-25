@@ -14,12 +14,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY map-service/requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
-COPY map-service/generate_map ./generate_map
 COPY shared ./shared
-COPY map-service/app ./app
+COPY map-service/src ./src
 
 ENV PYTHONPATH=/app
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
