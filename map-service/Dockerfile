@@ -9,6 +9,8 @@ WORKDIR /app
 # System deps needed by scipy wheels
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    pkg-config \
+    libhdf5-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY map-service/requirements.txt ./requirements.txt

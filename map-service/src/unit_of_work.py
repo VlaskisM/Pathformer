@@ -54,23 +54,43 @@ class UnitOfWork(UnitOfWorkInterface):
 
             
     async def upload(self, bucket: str, key: str, data: bytes) -> None:
+        if self._committed:
+            raise RuntimeError("Unit of work already committed")
+
         self._pending_uploads.append((bucket, key, data))
 
     async def publish(self, routing_key: str, payload: dict) -> None:
+        if self._committed:
+            raise RuntimeError("Unit of work already committed")
+
         self._pending_events.append((routing_key, payload))
 
     async def commit(self) -> None:
-        for bucket, key, data in self._pending_uploads:
-            await self._storage.upload(bucket, key, data)
+        if self._committed:
+            raise RuntimeError("Unit of work already committed")
 
-        for routing_key, payload in self._pending_events:
-            await self._broker.publish(routing_key, payload)
+        try:
+            for bucket, key, data in self._pending_uploads:
+                await self._storage.upload(bucket, key, data)
+        except Exception:
+            await self._storage.delete(bucket, key)
+            raise RuntimeError("Failed to upload file")
+
+        try:
+            for routing_key, payload in self._pending_events:
+                await self._broker.publish(routing_key, payload)
+        except Exception:
+            raise RuntimeError("Failed to upload publish event")
+        
 
         self._pending_uploads.clear()
         self._pending_events.clear()
         self._committed = True
 
     async def rollback(self) -> None:
+        if self._committed:
+            raise RuntimeError("Unit of work already committed")
+            
         self._pending_events.clear()
         self._pending_uploads.clear()
         self._committed = False
