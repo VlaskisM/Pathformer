@@ -17,6 +17,9 @@ class S3ClientInterface(ABC):
     @abstractmethod
     async def close(self) -> None: ...
 
+    @abstractmethod
+    async def delete(self, bucket: str, key: str) -> None: ...
+
 
 class S3Client(S3ClientInterface):
     def __init__(
@@ -68,3 +71,10 @@ class S3Client(S3ClientInterface):
         resp = await self._client.get_object(Bucket=bucket, Key=key)
         async with resp["Body"] as stream:
             return await stream.read()
+
+    async def delete(self, bucket: str, key: str) -> None:
+        try:
+            await self._client.head_object(Bucket=bucket, Key=key)
+            await self._client.delete_object(Bucket=bucket, Key=key)
+        except Exception:
+            raise FileNotFoundError(f"File {key} not found in bucket {bucket}")
